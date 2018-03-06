@@ -1,11 +1,7 @@
 body {
-    background-color: white;
+    background-color: black;
 }
 
 .dot {
-    fill: black;
-}
-
-.dotOld {
-    fill: grey;
+    fill: white;
 }

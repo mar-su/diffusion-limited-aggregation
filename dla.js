@@ -1,5 +1,5 @@
-var w = 1100, h = 1100, pad = 50; // defining width w and height h of the SVG element; and a little padding pad for the plot
-var N = 500; // number of particles N
+const W = 800, H = 800; // defining width w and height h of the SVG element;
+const N = 500; // number of particles N
 
 
 var birthRadius = 1.0; // radius of the circle, where a new particle start its random walk
@@ -12,11 +12,11 @@ var dimensionStep = 2.0 * pointRadius; // determines how big the step in each di
 
 var svg = d3.select("#dla") // Select the plot element from the DOM
     .append("svg") // Append an SVG element to it
-    .attr("height", h)
-    .attr("width", w);
+    .attr("height", H)
+    .attr("width", W);
 
-
-var t0 = performance.now();
+document.getElementById("message").innerHTML =
+        "Running Diffusion Limited Aggregation (DLA) with " + N + " particles. This may take some time.";
 
 var cluster = [];
 
@@ -32,6 +32,12 @@ var tree = new kdTree([], distance, ["x", "y"]);
 // initial point
 cluster.push({x: 0, y: 0, r: pointRadius})
 tree.insert({x: 0, y: 0, r: pointRadius});
+
+// wait a little bit, such that rest of page can be loaded
+sleep(100).then(() => {
+
+// start time measuring
+var t0 = performance.now();
 
 for (i = 1; i < N; i++) {
     var point = randomWalk()
@@ -61,48 +67,25 @@ for (i = 1; i < N; i++) {
 
 draw();
 
-/*/ Scales
-var xMin = d3.min(cluster, function(d) { return d.x; }), xMax = d3.max(cluster, function(d) { return d.x; });
-var xScale = d3.scaleLinear() // For the X axis
-    .domain([xMin, xMax])
-    .range([pad, w - pad]);
+var t1 = performance.now();
 
-var yMin = d3.min(cluster, function(d) { return d.y; }), yMax = d3.max(cluster, function(d) { return d.y; });
-var yScale = d3.scaleLinear() // For the Y axis
-    .domain([yMin, yMax])
-    .range([pad, h - pad]);
+console.log("Simulation took " + (t1 - t0) / 1000.0 + " seconds.")
 
-var bestScale;
-if( xMax - xMin > yMax - yMin ) {
-  bestScale = d3.scaleLinear() // For the X axis
-      .domain([xMin, xMax])
-      .range([pad, w - pad]);
-} else {
-  bestScale = d3.scaleLinear() // For the Y axis
-      .domain([yMin, yMax])
-      .range([pad, h - pad]);
-}
 
-var rScale = d3.scaleLinear() // Custom scale for the radii
-    .domain([0, d3.max(cluster, function(d) { return d.r; })])
-    .range([1, 5]); // Custom range, change it to see the effects!
-
-    */
+document.getElementById("message").innerHTML = "Diffusion Limited Aggregation (DLA) with " + N + " particles.";
+});
 
 function draw(){
   svg.selectAll("circle") // Returns ALL matching elements
     .data(cluster) // Bind data to DOM
     .enter() // Add one circle per such data point
     .append("circle")
-    .attr("cx", function(d) { return /*bestScale(*/d.x * 5 + w/2/*)*/; })
-    .attr("cy", function(d) { return /*bestScale(*/d.y * 5 + h/2/*)*/; })
-    .attr("r", function(d) { return /*rScale(*/d.r * 5/*)*/; })
+    .attr("cx", function(d) { return d.x * 5 + W/2; })
+    .attr("cy", function(d) { return d.y * 5 + H/2; })
+    .attr("r", function(d) { return d.r * 5; })
     .attr("class", "dot");
 }
 
-var t1 = performance.now();
-
-console.log("Simulation took " + (t1 - t0) / 1000.0 + " seconds.")
 
 function moveRandom(point){
     var range = 2.0 * dimensionStep;
@@ -193,8 +176,8 @@ function correctPosition(w, o, k){
     // o = old point (previous walking point)
     // k = collision point
 
-    // 2 * r = sqrt((x-u)² + (y - (m * x + t))²)
-    // 2 * r = sqrt((u-x)² + (v - (m * x + t))²)
+    // get the correct position with following equation:
+    // 2 * r = sqrt(( x - u)² + (m * x + t - y)²)
 
 /*
     console.log("----- input correctPosition")
@@ -232,9 +215,6 @@ function correctPosition(w, o, k){
         console.log(w.y - m * w.x);
         console.log(r);
 //*/
-    if (Math.abs(w.y - m * w.x - t) > 0.000001){
-      console.log("*** outch different values for t")
-    }
 
 
     a = 1 + Math.pow(m, 2.0);
@@ -253,6 +233,7 @@ function correctPosition(w, o, k){
     if( d < 0.0 ){
       console.log("########### Error")
       console.log("D < 0 !")
+      console.log("There is no solution!")
       console.log(d)
     }
 
