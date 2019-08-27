@@ -1,5 +1,6 @@
 # Diffusion Limited Aggregation
 ![](dla_500_example.png)
+
 Produces a mesmerizing structure, which is also called a [Brownian tree](https://rosettacode.org/wiki/Brownian_tree). You should be able to see it above.
 
 
