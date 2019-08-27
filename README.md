@@ -8,6 +8,8 @@ Most of the implementations (e. g. in [Rosetta Code](https://rosettacode.org/wik
 
 **Note:** The script is - for now - pretty exhaustive. In case you want to add this to a website, you maybe should add sleeps at each particle step.
 
+Get a live demo [here](https://mar-su.github.io/diffusion-limited-aggregation/dla.html), but be warned, it will take some CPU load! (For my laptop, it's around 20 seconds, but thats worth it!) 
+
 # Getting started
 Download / clone the repository and start the `dla.html` in a browser of your choice.
 
